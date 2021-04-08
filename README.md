@@ -19,10 +19,4 @@ If you notice any problems open an issue or a pull request, I'll respond ASAP.  
 
 ## Installation
 ```
-git clone https://github.com/ryanjohnsontv/node-red-contrib-inovelli-notification-calculator.git
-
-npm i node-red-contrib-inovelli-notification-calculator
-
-reboot
-```
-**For supervised installations I recommend adding the add-on "SSH & Web Terminal", add '- npm' as a package in the configuration for this add-on, then navigate to the Node-RED directory (```cd config/node-red```) and follow the above installation instructions.
+npm install node-red-contrib-inovelli-notification-calculator

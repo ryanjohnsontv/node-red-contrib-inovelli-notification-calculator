@@ -1,0 +1,86 @@
+[
+    {
+        "id": "9aed434a.fb9e6",
+        "type": "inject",
+        "z": "41861067.8521b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "4706af39.941c5"
+            ]
+        ]
+    },
+    {
+        "id": "4706af39.941c5",
+        "type": "inovelli-notification-calculator",
+        "z": "41861067.8521b",
+        "name": "",
+        "nodeid": "1",
+        "entityid": "light.guest_bedroom_fan_light_dimmer_light_level",
+        "zwave": "zwave_js",
+        "color": "107",
+        "brightness": "5",
+        "duration": 30,
+        "effect": "1",
+        "switchtype": "25",
+        "x": 390,
+        "y": 120,
+        "wires": [
+            [
+                "86eee6b6.83d958"
+            ]
+        ]
+    },
+    {
+        "id": "86eee6b6.83d958",
+        "type": "api-call-service",
+        "z": "41861067.8521b",
+        "name": "Inovelli Test",
+        "server": "7931a4b6.dc7fbc",
+        "version": 1,
+        "debugenabled": false,
+        "service_domain": "",
+        "service": "",
+        "entityId": "",
+        "data": "",
+        "dataType": "json",
+        "mergecontext": "",
+        "output_location": "payload",
+        "output_location_type": "msg",
+        "mustacheAltTags": false,
+        "x": 610,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7931a4b6.dc7fbc",
+        "type": "server",
+        "name": "Home Assistant",
+        "legacy": false,
+        "addon": true,
+        "rejectUnauthorizedCerts": true,
+        "ha_boolean": "y|yes|true|on|home|open",
+        "connectionDelay": true,
+        "cacheJson": true
+    }
+]

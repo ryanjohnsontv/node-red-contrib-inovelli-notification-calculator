@@ -1,0 +1,140 @@
+[
+    {
+        "id": "b38bd8b8.5a2af8",
+        "type": "inovelli-notification-calculator",
+        "z": "f651da8c.4816f8",
+        "name": "",
+        "nodeid": "",
+        "entityid": "",
+        "zwave": "zwave_js",
+        "color": "107",
+        "brightness": "5",
+        "duration": 30,
+        "effect": "4",
+        "switchtype": "24",
+        "x": 510,
+        "y": 100,
+        "wires": [
+            [
+                "531f74fb.6c3d3c"
+            ]
+        ]
+    },
+    {
+        "id": "531f74fb.6c3d3c",
+        "type": "api-call-service",
+        "z": "f651da8c.4816f8",
+        "name": "Test",
+        "server": "7931a4b6.dc7fbc",
+        "version": "1",
+        "debugenabled": false,
+        "service_domain": "",
+        "service": "",
+        "entityId": "",
+        "data": "",
+        "dataType": "json",
+        "mergecontext": "",
+        "output_location": "payload",
+        "output_location_type": "msg",
+        "mustacheAltTags": false,
+        "x": 710,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2f9b477.d2230b8",
+        "type": "comment",
+        "z": "f651da8c.4816f8",
+        "name": "",
+        "info": "You can send payload parameters to override status manager settings (e.g. programatically setting a color or pulse type)",
+        "x": 300,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "e23e089f.6aecb8",
+        "type": "inject",
+        "z": "f651da8c.4816f8",
+        "name": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 140,
+        "y": 100,
+        "wires": [
+            [
+                "35c95880.f6fe18"
+            ]
+        ]
+    },
+    {
+        "id": "35c95880.f6fe18",
+        "type": "function",
+        "z": "f651da8c.4816f8",
+        "name": "",
+        "func": "return {\n    payload: {\n        color: \"red\",\n        brightness: 3,\n        duration: \"34 minutes\"\n    }\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 290,
+        "y": 100,
+        "wires": [
+            [
+                "b38bd8b8.5a2af8"
+            ]
+        ]
+    },
+    {
+        "id": "febbc22b.7e5d",
+        "type": "inject",
+        "z": "f651da8c.4816f8",
+        "name": "",
+        "props": [
+            {
+                "p": "payload.color",
+                "v": "[200,200,20]",
+                "vt": "json"
+            },
+            {
+                "p": "payload.entity_id",
+                "v": "light.bedroom",
+                "vt": "str"
+            },
+            {
+                "p": "payload.duration",
+                "v": "2 hours",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "b38bd8b8.5a2af8"
+            ]
+        ]
+    },
+    {
+        "id": "7931a4b6.dc7fbc",
+        "type": "server",
+        "name": "Home Assistant",
+        "legacy": false,
+        "addon": true,
+        "rejectUnauthorizedCerts": true,
+        "ha_boolean": "y|yes|true|on|home|open",
+        "connectionDelay": true,
+        "cacheJson": true
+    }
+]

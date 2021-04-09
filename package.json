@@ -1,11 +1,11 @@
 {
   "name": "node-red-contrib-inovelli-notification-calculator",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/ryanjohnsontv/node-red-contrib-inovelli-notification-calculator.git"
   },
-  "description": "Node used with Home Assistant to easily control LED notifications for Inovelli RED Series switches",
+  "description": "Node used with Home Assistant to easily control LED notifications for Inovelli Red Series switches",
   "keywords": [
     "inovelli",
     "node-red",

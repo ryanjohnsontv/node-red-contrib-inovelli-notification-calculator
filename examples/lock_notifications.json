@@ -1,0 +1,119 @@
+[
+    {
+        "id": "fcf125a9.7f74a8",
+        "type": "server-state-changed",
+        "z": "78b0a40b.1439bc",
+        "name": "Locks LZW36",
+        "server": "7931a4b6.dc7fbc",
+        "version": 1,
+        "exposeToHomeAssistant": false,
+        "haConfig": [
+            {
+                "property": "name",
+                "value": ""
+            },
+            {
+                "property": "icon",
+                "value": ""
+            }
+        ],
+        "entityidfilter": "binary_sensor.locks",
+        "entityidfiltertype": "exact",
+        "outputinitially": false,
+        "state_type": "str",
+        "haltifstate": "",
+        "halt_if_type": "str",
+        "halt_if_compare": "is",
+        "outputs": 1,
+        "output_only_on_state_change": true,
+        "for": 0,
+        "forType": "num",
+        "forUnits": "minutes",
+        "ignorePrevStateNull": true,
+        "ignorePrevStateUnknown": true,
+        "ignorePrevStateUnavailable": true,
+        "ignoreCurrentStateUnknown": true,
+        "ignoreCurrentStateUnavailable": true,
+        "x": 150,
+        "y": 2620,
+        "wires": [
+            [
+                "9821164.1ed1ee8"
+            ]
+        ]
+    },
+    {
+        "id": "9821164.1ed1ee8",
+        "type": "function",
+        "z": "78b0a40b.1439bc",
+        "name": "",
+        "func": "var lock = msg.payload;\nvar entities = \"light.guest_bedroom_fan_light_dimmer_light_level,light.bedroom_fan_light_dimmer_light_level,light.living_room_fan_light_dimmer_light_level,light.office_fan_light_dimmer_light_level\";\nif (lock === \"on\") {\n    node.send({payload:{entity_id:entities,color:\"red\",\"brightness\":5,effect:\"Solid\",duration:\"forever\",switchtype:\"lzw36\"}});\n}\nelse if (lock === \"off\") {\n    node.send({payload:{entity_id:entities,color:\"green\",\"brightness\":5,effect:\"Pulse\",duration:\"10 seconds\",switchtype:\"lzw36\"}});\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "x": 300,
+        "y": 2620,
+        "wires": [
+            [
+                "ba8523ac.438fa"
+            ]
+        ]
+    },
+    {
+        "id": "ba8523ac.438fa",
+        "type": "inovelli-notification-calculator",
+        "z": "78b0a40b.1439bc",
+        "name": "",
+        "nodeid": "",
+        "entityid": "",
+        "zwave": "zwave_js",
+        "color": 0,
+        "brightness": 5,
+        "duration": 10,
+        "effect": 4,
+        "switchtype": 8,
+        "clear": false,
+        "x": 510,
+        "y": 2620,
+        "wires": [
+            [
+                "488d8be6.10acd4"
+            ]
+        ]
+    },
+    {
+        "id": "488d8be6.10acd4",
+        "type": "api-call-service",
+        "z": "78b0a40b.1439bc",
+        "name": "",
+        "server": "7931a4b6.dc7fbc",
+        "version": 1,
+        "debugenabled": false,
+        "service_domain": "",
+        "service": "",
+        "entityId": "",
+        "data": "",
+        "dataType": "jsonata",
+        "mergecontext": "",
+        "output_location": "",
+        "output_location_type": "none",
+        "mustacheAltTags": false,
+        "x": 710,
+        "y": 2620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7931a4b6.dc7fbc",
+        "type": "server",
+        "name": "Home Assistant",
+        "legacy": false,
+        "addon": true,
+        "rejectUnauthorizedCerts": true,
+        "ha_boolean": "y|yes|true|on|home|open",
+        "connectionDelay": true,
+        "cacheJson": true
+    }
+]

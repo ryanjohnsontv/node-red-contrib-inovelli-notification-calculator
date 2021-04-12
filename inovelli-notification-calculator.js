@@ -38,7 +38,7 @@ module.exports = function (RED) {
         clear: presetClear,
       } = node;
       const { payload } = msg;
-      const zwave = payload.zwave || presetZwave;
+      const domain = payload.zwave || presetZwave;
       const brightness = payload.brightness || presetBrightness;
       var color = payload.color || presetColor;
       var duration = payload.duration || presetDuration;
@@ -64,7 +64,9 @@ module.exports = function (RED) {
             switchConvert = 24;
           } else if (["combo_fan", "lzw36_fan", "fan"].includes(switchtype)) {
             switchConvert = 25;
-          } else if (["lzw36", "fan and light", "light and fan"].includes(switchtype)) {
+          } else if (
+            ["lzw36", "fan and light", "light and fan"].includes(switchtype)
+          ) {
             switchConvert = 49;
           }
           if (switchConvert !== undefined) {
@@ -155,8 +157,6 @@ module.exports = function (RED) {
             duration = value * 24 + 120;
           } else if (["forever", "indefinite", "indefinitely"].includes(unit)) {
             duration = 255;
-          } else if (["off", "silent"].includes(unit)) {
-            duration = 0;
           } else {
             node.error(`Incorrect Duration Format: ${duration}`);
             error++;
@@ -210,16 +210,41 @@ module.exports = function (RED) {
       duration = inputDurationConvert(duration);
       effect = inputEffectConvert(effect, switchtype);
 
+      sendNotification = function (domain, service, id, switchtype, value) {
+        var parameter = switchtype;
+        if (parameter === 49) {
+          for (parameter = 24; parameter < 26; parameter++) {
+            node.send({
+              payload: {
+                domain,
+                service,
+                data: { ...id, parameter, value },
+              },
+            });
+          }
+        } else {
+          node.send({
+            payload: {
+              domain,
+              service,
+              data: { ...id, parameter, value },
+            },
+          });
+        }
+      };
+
       if (error === 0) {
         const hsl = convert.rgb.hsl(color);
         const keyword = convert.rgb.keyword(color);
         const hue = parseInt((hsl[0] * (17 / 24)).toFixed(0));
         var value =
           hue + brightness * 255 + duration * 65536 + effect * 16777216;
-        switch (zwave) {
+        var service, id;
+        switch (domain) {
           case "zwave_js":
             const entityId = payload.entity_id || entityid;
-            const entity_id = entityId ? { entity_id: entityId } : {};
+            id = entityId ? { entity_id: entityId } : {};
+            service = "bulk_set_partial_config_parameters";
             switch (clear) {
               case true:
                 value = 65536;
@@ -229,49 +254,11 @@ module.exports = function (RED) {
                 node.status(`Sent Color: ${keyword}`);
                 break;
             }
-            if (switchtype === 49) {
-              node.send({
-                ...msg,
-                payload: {
-                  domain: zwave,
-                  service: "bulk_set_partial_config_parameters",
-                  data: {
-                    ...entity_id,
-                    parameter: 24,
-                    value,
-                  },
-                },
-              });
-              node.send({
-                ...msg,
-                payload: {
-                  domain: zwave,
-                  service: "bulk_set_partial_config_parameters",
-                  data: {
-                    ...entity_id,
-                    parameter: 25,
-                    value,
-                  },
-                },
-              });
-            } else {
-              node.send({
-                ...msg,
-                payload: {
-                  domain: zwave,
-                  service: "bulk_set_partial_config_parameters",
-                  data: {
-                    ...entity_id,
-                    parameter: switchtype,
-                    value,
-                  },
-                },
-              });
-            }
             break;
           case "ozw":
             const nodeId = payload.node_id || nodeid;
-            const node_id = nodeId ? { node_id: nodeId } : {};
+            id = nodeId ? { node_id: nodeId } : {};
+            service = "set_config_parameter";
             switch (clear) {
               case true:
                 value = 0;
@@ -281,35 +268,9 @@ module.exports = function (RED) {
                 node.status(`Sent Color: ${keyword}`);
                 break;
             }
-            if (switchtype === 49) {
-              node.send({
-                ...msg,
-                payload: {
-                  domain: zwave,
-                  service: "set_config_parameter",
-                  data: { ...node_id, parameter: 24, value },
-                },
-              });
-              node.send({
-                ...msg,
-                payload: {
-                  domain: zwave,
-                  service: "set_config_parameter",
-                  data: { ...node_id, parameter: 25, value },
-                },
-              });
-            } else {
-              node.send({
-                ...msg,
-                payload: {
-                  domain: zwave,
-                  service: "set_config_parameter",
-                  data: { ...node_id, parameter: switchtype, value },
-                },
-              });
-            }
             break;
         }
+        sendNotification(domain, service, id, switchtype, value);
       } else {
         node.status(`Error! Check debug window for more info`);
       }

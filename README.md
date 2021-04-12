@@ -23,7 +23,7 @@ be connected to an api-call-service node. This node will automatically fill in t
 
 ### Z-Wave Integration
 
-You are able to choose between OZW or Z-Wave JS as your integration. This can also be set by 
+You are able to choose between OZW or Z-Wave JS as your integration. This can also be set via msg.payload.zwave (ozw or zwave_js).
 
 ### Entity ID/Node ID
 

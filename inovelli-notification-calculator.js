@@ -12,6 +12,7 @@ module.exports = function (RED) {
       duration,
       effect,
       switchtype,
+      clear,
     } = config;
 
     this.zwave = zwave;
@@ -22,6 +23,7 @@ module.exports = function (RED) {
     this.duration = parseInt(duration, 10);
     this.effect = parseInt(effect, 10);
     this.switchtype = parseInt(switchtype, 10);
+    this.clear = clear;
 
     node.on("input", (msg) => {
       const {
@@ -33,6 +35,7 @@ module.exports = function (RED) {
         duration: presetDuration,
         effect: presetEffect,
         switchtype: presetSwitchtype,
+        clear: presetClear,
       } = node;
       const { payload } = msg;
       const zwave = payload.zwave || presetZwave;
@@ -41,7 +44,41 @@ module.exports = function (RED) {
       var duration = payload.duration || presetDuration;
       var effect = payload.effect || presetEffect;
       var switchtype = payload.switchtype || presetSwitchtype;
+      var clear;
+      if (payload.clear === undefined) {
+        clear = presetClear;
+      } else {
+        clear = payload.clear;
+      }
       var error = 0;
+
+      var inputSwitchConvert = function (switchtype) {
+        if (isNaN(switchtype)) {
+          switchtype = switchtype.toLowerCase();
+          var switchConvert;
+          if (["switch", "lzw30", "lzw30-sn"].includes(switchtype)) {
+            switchConvert = 8;
+          } else if (["dimmer", "lzw31", "lzw31-sn"].includes(switchtype)) {
+            switchConvert = 16;
+          } else if (["combo_light", "lzw36_light"].includes(switchtype)) {
+            switchConvert = 24;
+          } else if (["combo_fan", "lzw36_fan", "fan"].includes(switchtype)) {
+            switchConvert = 25;
+          } else if (["lzw36", "fan and light", "light and fan"].includes(switchtype)) {
+            switchConvert = 49;
+          }
+          if (switchConvert !== undefined) {
+            switchtype = switchConvert;
+          } else {
+            node.error(`Incorrect Switch Type: ${switchtype}`);
+            error++;
+          }
+        } else if (![8, 16, 24, 25, 49].includes(switchtype)) {
+          node.error(`Incorrect Switch Value: ${switchtype}`);
+          error++;
+        }
+        return switchtype;
+      };
 
       var inputColorConvert = function (color) {
         if (Array.isArray(color) && typeof color === "object") {
@@ -79,27 +116,13 @@ module.exports = function (RED) {
         return rgb;
       };
 
-      var inputSwitchConvert = function (switchtype) {
-        if (isNaN(switchtype)) {
-          switchtype = switchtype.toLowerCase();
-          const switchType = {
-            switch: 8,
-            dimmer: 16,
-            combo_light: 24,
-            combo_fan: 25,
-          };
-          let switchConvert = switchType[switchtype];
-          if (switchConvert !== undefined) {
-            switchtype = switchConvert;
-          } else {
-            node.error(`Incorrect Switch Type: ${switchtype}`);
-            error++;
-          }
-        } else if (![8, 16, 24, 25].includes(switchtype)) {
-          node.error(`Incorrect Switch Value: ${switchtype}`);
+      var inputBrightnessCheck = function (brightness) {
+        if (brightness < 0 || brightness > 11) {
+          node.error(
+            `Invalid brightness value: ${brightness}. Please enter a value between 0 and 10.`
+          );
           error++;
         }
-        return switchtype;
       };
 
       var inputDurationConvert = function (duration) {
@@ -108,7 +131,7 @@ module.exports = function (RED) {
           let unit = duration.replace(/^[\s\d]+/, "").toLowerCase();
           if (
             ["second", "seconds"].includes(unit) &&
-            value >= 0 &&
+            value > 0 &&
             value <= 60
           ) {
             duration = value;
@@ -138,7 +161,7 @@ module.exports = function (RED) {
             node.error(`Incorrect Duration Format: ${duration}`);
             error++;
           }
-        } else if (duration < 0 || duration > 255) {
+        } else if (duration < 1 || duration > 255) {
           node.error(`Incorrect Duration: ${duration}`);
           error++;
         }
@@ -166,7 +189,7 @@ module.exports = function (RED) {
           if (switchtype === 8 && switchOptions[effect] !== undefined) {
             effect = switchOptions[effect];
           } else if (
-            [16, 24, 25].includes(switchtype) &&
+            [16, 24, 25, 49].includes(switchtype) &&
             dimmerOptions[effect] !== undefined
           ) {
             effect = dimmerOptions[effect];
@@ -182,56 +205,118 @@ module.exports = function (RED) {
       };
 
       switchtype = inputSwitchConvert(switchtype);
-      inputColorConvert(color);
+      color = inputColorConvert(color);
+      inputBrightnessCheck(brightness);
       duration = inputDurationConvert(duration);
       effect = inputEffectConvert(effect, switchtype);
 
-      const hsl = convert.rgb.hsl(rgb);
-      const keyword = convert.rgb.keyword(rgb);
-      color = parseInt((hsl[0] * (17 / 24)).toFixed(0));
       if (error === 0) {
+        const hsl = convert.rgb.hsl(color);
+        const keyword = convert.rgb.keyword(color);
+        const hue = parseInt((hsl[0] * (17 / 24)).toFixed(0));
+        var value =
+          hue + brightness * 255 + duration * 65536 + effect * 16777216;
         switch (zwave) {
           case "zwave_js":
             const entityId = payload.entity_id || entityid;
             const entity_id = entityId ? { entity_id: entityId } : {};
-            node.send({
-              ...msg,
-              payload: {
-                domain: zwave,
-                service: "bulk_set_partial_config_parameters",
-                data: {
-                  ...entity_id,
-                  parameter: switchtype,
-                  value: {
-                    255: color,
-                    65280: brightness,
-                    16711680: duration,
-                    2130706432: effect
+            switch (clear) {
+              case true:
+                value = 65536;
+                node.status(`Cleared notification!`);
+                break;
+              case false:
+                node.status(`Sent Color: ${keyword}`);
+                break;
+            }
+            if (switchtype === 49) {
+              node.send({
+                ...msg,
+                payload: {
+                  domain: zwave,
+                  service: "bulk_set_partial_config_parameters",
+                  data: {
+                    ...entity_id,
+                    parameter: 24,
+                    value,
                   },
                 },
-              },
-            });
+              });
+              node.send({
+                ...msg,
+                payload: {
+                  domain: zwave,
+                  service: "bulk_set_partial_config_parameters",
+                  data: {
+                    ...entity_id,
+                    parameter: 25,
+                    value,
+                  },
+                },
+              });
+            } else {
+              node.send({
+                ...msg,
+                payload: {
+                  domain: zwave,
+                  service: "bulk_set_partial_config_parameters",
+                  data: {
+                    ...entity_id,
+                    parameter: switchtype,
+                    value,
+                  },
+                },
+              });
+            }
             break;
           case "ozw":
-            const value =
-              color + brightness * 255 + duration * 65536 + effect * 16777216;
             const nodeId = payload.node_id || nodeid;
             const node_id = nodeId ? { node_id: nodeId } : {};
-            node.send({
-              ...msg,
-              payload: {
-                domain: zwave,
-                service: "set_config_parameter",
-                data: { ...node_id, parameter: switchtype, value },
-              },
-            });
+            switch (clear) {
+              case true:
+                value = 0;
+                node.status(`Cleared notification!`);
+                break;
+              case false:
+                node.status(`Sent Color: ${keyword}`);
+                break;
+            }
+            if (switchtype === 49) {
+              node.send({
+                ...msg,
+                payload: {
+                  domain: zwave,
+                  service: "set_config_parameter",
+                  data: { ...node_id, parameter: 24, value },
+                },
+              });
+              node.send({
+                ...msg,
+                payload: {
+                  domain: zwave,
+                  service: "set_config_parameter",
+                  data: { ...node_id, parameter: 25, value },
+                },
+              });
+            } else {
+              node.send({
+                ...msg,
+                payload: {
+                  domain: zwave,
+                  service: "set_config_parameter",
+                  data: { ...node_id, parameter: switchtype, value },
+                },
+              });
+            }
             break;
         }
-        node.status({ text: `Sent color: ${keyword}` });
       } else {
-        node.status({ text: `Error! Check debug window for more info` });
+        node.status(`Error! Check debug window for more info`);
       }
     });
   }
-  RED.nodes.registerType("inovelli-notification-calculator", InovelliNotificationCalculator);
+  RED.nodes.registerType(
+    "inovelli-notification-calculator",
+    InovelliNotificationCalculator
+  );
 };

@@ -12,6 +12,7 @@
       duration: { value: 10 },
       effect: { value: 4 },
       switchtype: { value: 8 },
+      clear: { value: false}
     },
     inputs: 1,
     outputs: 1,
@@ -168,6 +169,7 @@
         <option value="16">Dimmer (LZW31-SN)</option>
         <option value="24">Light Dimmer (LZW36)</option>
         <option value="25">Fan Dimmer (LZW36)</option>
+        <option value="49">Fan & Light (LZW36)</option>
     </select>
   </div>
   <div class="form-row color-input">
@@ -187,7 +189,6 @@
   <div class="form-row">
     <label for="node-input-duration"><i class="icon-tag"></i>Duration</label>
     <select name="node-input-duration" id="node-input-duration">
-        <option value="0">Off</option>
         <option value="1">1 Second</option>
         <option value="2">2 Seconds</option>
         <option value="3">3 Seconds</option>
@@ -226,6 +227,10 @@
         <option value="5">Placeholder</option>
     </select>
   </div>
+  <div class="form-row">
+    <label for="node-input-clear"><i class="icon-tag"></i>Clear Notification</label>
+    <input type="checkbox" id="node-input-clear">
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="inovelli-notification-calculator">
@@ -241,7 +246,7 @@
         <dd>(For OZW) Node id of the Inovelli switch you are trying to configure</dd>
 
         <dt>Switch Type<span class="property-type">number|string</span></dt>
-        <dd>Determines which parameter to set. (8 is for on/off switches, 16 is for dimmers, 24/25 if for combo light/fan dimmers)</dd>
+        <dd>Determines which parameter to set. (LZW30-SN, LZW31-SN, LZW36 (fan and/or light))</dd>
 
         <dt>Color<span class="property-type">number|string|array</span></dt>
         <dd>Color you want to display (accepts color names, RGB arrays, hexadeciaml and 0-360 hue values)</dd>
@@ -254,6 +259,9 @@
 
         <dt>Effect<span class="property-type">number|string</span></dt>
         <dd>Effect for the notifications. (Off, Solid, Chase, Fast Blink, Slow Blink, Pulse)</dd>
+
+        <dt>Clear Notification<span class="property-type">boolean</span></dt>
+        <dd>Check this box or set msg.payload.clear to true to clear the current LED notification</dd>
     </dl>
     <p>
       It is possible to override values set on this node by passing values in a payload e.g.
@@ -280,7 +288,8 @@
       duration: 10,
       effect: 3,
       brightness: 10,
-      switchtype: 25
+      switchtype: 25,
+      clear: false
     }
   }
       </pre>

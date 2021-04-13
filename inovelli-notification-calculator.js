@@ -250,8 +250,8 @@ module.exports = function (RED) {
       }
 
       if (error === 0) {
-        const hsl = convert.rgb.hsl(color);
-        const keyword = convert.rgb.keyword(color);
+        const hsl = [(convert.rgb.hsl(color)[0]),100,50];
+        const keyword = convert.rgb.keyword(convert.hsl.rgb(hsl));
         const hue = parseInt((hsl[0] * (17 / 24)).toFixed(0));
         var value =
           hue + brightness * 256 + duration * 65536 + effect * 16777216;

@@ -16,6 +16,9 @@ If you notice any problems open an issue or a pull request, I'll respond ASAP.  
 -   Easily clear notifications
 
 
+![image](https://user-images.githubusercontent.com/43426700/114622017-0f7db200-9c73-11eb-8c48-1fd31c3b8141.png)
+
+
 ## How to use
 
 This node should be used in conjunction with the node-red–contrib-home-assistant-websocket plaette, and the output should

@@ -37,6 +37,7 @@ module.exports = function (RED) {
         switchtype: presetSwitchtype,
         clear: presetClear,
       } = node;
+      //const payload = msg.payload ? { msg } : {};
       var { payload } = msg;
       if (payload === undefined) {
         payload = {};
@@ -225,8 +226,8 @@ module.exports = function (RED) {
       duration = inputDurationConvert(duration);
       effect = inputEffectConvert(effect, parameter);
 
-      function sendNotification(domain, service, id, parameter, size, value) {
-        size = size ? { size } : {};
+      function sendNotification(domain, service, id, parameter, value) {
+        var size = (domain === zwave) ? { size: 4 } : {};
         if (parameter === 49) {
           for (parameter = 24; parameter < 26; parameter++) {
             node.send({
@@ -254,7 +255,7 @@ module.exports = function (RED) {
         const hue = parseInt((hsl[0] * (17 / 24)).toFixed(0));
         var value =
           hue + brightness * 256 + duration * 65536 + effect * 16777216;
-        var service, id, size;
+        var service, id;
         if (domain === "zwave_js") {
           const entity_id = payload.entity_id || entityid;
           id = entity_id ? { entity_id } : {};
@@ -265,7 +266,7 @@ module.exports = function (RED) {
           } else {
             node.status(`Sent Color: ${keyword}`);
           }
-          sendNotification(domain, service, id, parameter, size, value);
+          sendNotification(domain, service, id, parameter, value);
         } else if (["ozw", "zwave"].includes(domain)) {
           const node_id = payload.node_id || nodeid;
           id = node_id ? { node_id } : {};
@@ -276,12 +277,7 @@ module.exports = function (RED) {
           } else {
             node.status(`Sent Color: ${keyword}`);
           }
-          switch (domain) {
-            case "zwave":
-              size = 4;
-              break;
-          }
-          sendNotification(domain, service, id, parameter, size, value);
+          sendNotification(domain, service, id, parameter, value);
         } else {
           node.error(
             `Invalid Z-Wave Domain: ${domain}. Accepted values are zwave_js, ozw, or zwave`

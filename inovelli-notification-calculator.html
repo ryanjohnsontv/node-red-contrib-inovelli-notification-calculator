@@ -46,6 +46,9 @@
             $(".nodeid-input").show();
             $(".entityid-input").hide();
             break;
+          case "zwave":
+            $(".nodeid-input").show();
+            $(".entityid-input").hide();
         }
       });
       $("#node-input-switchtype").change(function () {
@@ -86,7 +89,7 @@
       -webkit-appearance: none;
       appearance: none;
       width: 100%;
-      height: 15px;
+      height: 10px;
       border-radius: 5px;
       background: linear-gradient(to right, rgb(255,0,0), rgb(255,125,0), rgb(255,255,0), rgb(125,255,0), rgb(0,255,0), rgb(0,255,125), rgb(0,255,255), rgb(0,125,255), rgb(0,0,255), rgb(125,0,255), rgb(255,0,255), rgb(255,0,125), rgb(255,0,0));
       outline: none;
@@ -101,15 +104,13 @@
     .color-picker::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
+      width: 5px;
+      height: 20px;
       background: #FFFFFF;
     }
     .color-picker::-moz-range-thumb {
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
+      width: 5px;
+      height: 20px;
       background:	#FFFFFF;
     }
     .brightness-picker {
@@ -131,15 +132,13 @@
     .brightness-picker::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
+      width: 5px;
+      height: 20px;
       background: #FFFFFF;
     }
     .brightness-picker::-moz-range-thumb {
-      width: 25px;
-      height: 25px;
-      border-radius: 50%;
+      width: 5px;
+      height: 20px;
       background:	#FFFFFF;
     }
   </style>
@@ -151,7 +150,8 @@
     <label for="node-input-zwave"><i class="icon-tag"></i>Z-Wave Integration</label>
     <select name="node-input-zwave" id="node-input-zwave">
         <option value="zwave_js">Z-Wave JS</option>
-        <option value="ozw">OZW 1.6</option>
+        <option value="ozw">OpenZWave (1.6)</option>
+        <option value="zwave">Z-Wave (Deprecated)</option>
     </select>
   </div>
   <div class="form-row nodeid-input">
@@ -189,6 +189,7 @@
   <div class="form-row">
     <label for="node-input-duration"><i class="icon-tag"></i>Duration</label>
     <select name="node-input-duration" id="node-input-duration">
+        <option value="0">Off</option>
         <option value="1">1 Second</option>
         <option value="2">2 Seconds</option>
         <option value="3">3 Seconds</option>
@@ -237,13 +238,13 @@
     <p>This node will help construct the value for controlling LED notifications on an Inovelli Red Series switch. The output should be connected to a Home Assistant call service node.</p>
     <dl class="message-properties">
         <dt>Z-Wave Integration<span class="property-type">string</span></dt>
-        <dd>Your Z-Wave integration used in Home Assistant (zwave_js or ozw)</dd>
+        <dd>Your Z-Wave integration used in Home Assistant (zwave_js, ozw, or zwave)</dd>
 
         <dt>Entity Id<span class="property-type">string</span></dt>
         <dd>(For Z-Wave JS) Entity (or a comma-delimited list of entity ids) to set the configuration parameter on</dd>
 
         <dt>Node Id<span class="property-type">number</span></dt>
-        <dd>(For OZW) Node id of the Inovelli switch you are trying to configure</dd>
+        <dd>(For OpenZWave or Z-Wave) Node id of the Inovelli switch you are trying to configure</dd>
 
         <dt>Switch Type<span class="property-type">number|string</span></dt>
         <dd>Determines which parameter to set. (LZW30-SN, LZW31-SN, LZW36 (fan and/or light))</dd>

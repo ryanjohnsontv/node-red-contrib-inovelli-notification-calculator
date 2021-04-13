@@ -37,7 +37,10 @@ module.exports = function (RED) {
         switchtype: presetSwitchtype,
         clear: presetClear,
       } = node;
-      const { payload } = msg;
+      var { payload } = msg;
+      if (payload === undefined) {
+        payload = {};
+      }
       const domain = payload.zwave || presetZwave;
       const brightness = payload.brightness || presetBrightness;
       var color = payload.color || presetColor;
@@ -56,7 +59,7 @@ module.exports = function (RED) {
         if (isNaN(parameter)) {
           parameter = parameter.toLowerCase();
           var switchConvert;
-          if (["switch", "lzw30", "lzw30-sn"].includes(parameter)) {
+          if (["switch", "lzw30", "lzw30-sn", "on/off"].includes(parameter)) {
             switchConvert = 8;
           } else if (["dimmer", "lzw31", "lzw31-sn"].includes(parameter)) {
             switchConvert = 16;

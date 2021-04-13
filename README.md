@@ -7,7 +7,7 @@ This node allows you to easily set the appropriate values to send to your Inovel
 If you notice any problems open an issue or a pull request, I'll respond ASAP.  Thanks!
 
 ## Features
--   Support for OZW and Z-Wave JS (Requires Home Assistant 2021.4.0 or newer)
+-   Support for OpenZWave, Z-Wave (deprectaed), and Z-Wave JS (Requires Home Assistant 2021.4.0 or newer)
 -   Allows all fields to be controlled by the payload of an incoming message
 -   Use color-convert library to accept color names, RGB arrays, hexadecimals, or hue value as input
 -   Automatically convert input values to proper format (ie. "2 Hours" = 168 for Inovelli math)
@@ -23,7 +23,7 @@ be connected to an api-call-service node. This node will automatically fill in t
 
 ### Z-Wave Integration
 
-You are able to choose between Z-Wave JS, OpenZWave, or Z-Wave (deprecated) as your integration. This can also be set via msg.payload.zwave (zwave_js, ozw, or zwave).
+You are able to choose between Z-Wave JS, OpenZWave, or Z-Wave (deprecated) as your integration. This can also be set via msg.payload.zwave (values: zwave_js, ozw, or zwave).
 
 ### Entity ID/Node ID
 

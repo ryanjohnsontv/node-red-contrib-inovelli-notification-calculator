@@ -227,7 +227,7 @@ module.exports = function (RED) {
       effect = inputEffectConvert(effect, parameter);
 
       function sendNotification(domain, service, id, parameter, value) {
-        var size = (domain === zwave) ? { size: 4 } : {};
+        var size = (domain === "zwave") ? { size: 4 } : {};
         if (parameter === 49) {
           for (parameter = 24; parameter < 26; parameter++) {
             node.send({

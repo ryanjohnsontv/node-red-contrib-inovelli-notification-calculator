@@ -238,7 +238,7 @@ module.exports = function (RED) {
         const keyword = convert.rgb.keyword(color);
         const hue = parseInt((hsl[0] * (17 / 24)).toFixed(0));
         var value =
-          hue + brightness * 255 + duration * 65536 + effect * 16777216;
+          hue + brightness * 256 + duration * 65536 + effect * 16777216;
         var service, id;
         switch (domain) {
           case "zwave_js":

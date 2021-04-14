@@ -1,5 +1,7 @@
 # Inovelli Notification Calculator
 
+## **Recommended to use: https://github.com/ryanjohnsontv/node-red-contrib-ha-inovelli-manager Use this node if you don't care for scene or LED management nodes, I will continue to keep it updated.**
+
 Forked from the exceptionally wonderful https://github.com/pdong/node-contrib-inovelli-status-manager repo.
 
 This node allows you to easily set the appropriate values to send to your Inovelli Red Series switches.

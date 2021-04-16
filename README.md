@@ -1,6 +1,6 @@
 # Inovelli Notification Calculator
 
-## **Recommended to use: https://github.com/ryanjohnsontv/node-red-contrib-ha-inovelli-manager Continue using this package if you don't care for scene or LED management nodes, I will continue to keep it updated.**
+## **Deprecated in favor of: https://github.com/ryanjohnsontv/node-red-contrib-ha-inovelli-manager Continue using this package if you don't care for scene or LED management nodes, I will continue making bug fixes if they arise.**
 
 Forked from the exceptionally wonderful https://github.com/pdong/node-contrib-inovelli-status-manager repo.
 
